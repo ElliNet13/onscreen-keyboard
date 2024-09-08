@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: MainApp
+Class-Path: javafx-sdk-18.0.2/lib/javafx.controls.jar javafx-sdk-18.0.2/lib/javafx.fxml.jar
