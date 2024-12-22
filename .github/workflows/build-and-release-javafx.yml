@@ -57,11 +57,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # Step 2: Create a GitHub release and upload JAR
+    # Step 2: Create GitHub Release and Upload JAR using comnoco/create-release-action@v2.0.5
     - name: Create Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: comnoco/create-release-action@v2.0.5
       with:
         tag_name: ${{ github.sha }}
         release_name: Release for Commit: ${{ github.sha }}
@@ -71,3 +69,5 @@ jobs:
         draft: false
         prerelease: false
         files: keyboard.jar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
