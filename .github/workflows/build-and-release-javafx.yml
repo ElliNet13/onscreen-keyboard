@@ -57,7 +57,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # Step 2: Upload JAR to Release
+    # Step 2: Create a GitHub release and upload JAR
     - name: Create Release
       uses: actions/create-release@v1
       env:
@@ -70,5 +70,4 @@ jobs:
           ${{ github.event.head_commit.message }}
         draft: false
         prerelease: false
-        files: |
-          keyboard.jar
+        files: keyboard.jar
