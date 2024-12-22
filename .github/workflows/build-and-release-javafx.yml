@@ -1,56 +1,73 @@
-name: Build and Release JavaFX Jar
+name: Build and Release JAR
 
 on:
   push:
     branches:
-      - main # Trigger on pushes to the main branch
+      - main
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, 'v') # Only trigger if commit message contains 'v'
+    if: contains(github.event.head_commit.message, 'v')
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    # Step 1: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Set up Java 17
+    # Step 2: Set up Java
+    - name: Set up JDK
       uses: actions/setup-java@v3
       with:
+        java-version: 17
         distribution: 'temurin'
-        java-version: '17'
 
-    - name: Download JavaFX SDK
+    # Step 3: Download and extract JavaFX
+    - name: Download and Extract JavaFX SDK
       run: |
-        curl -L https://download2.gluonhq.com/openjfx/23.0.1/openjfx-23.0.1_linux-x64_bin-sdk.zip -o javafx-sdk.zip
+        curl -L https://download2.gluonhq.com/openjfx/17.0.8/openjfx-17.0.8_linux-x64_bin-sdk.zip -o javafx-sdk.zip
         unzip javafx-sdk.zip -d .
+        mv javafx-sdk-* javafx-sdk
 
+    # Step 4: Compile Java code
     - name: Compile Java code
       run: |
         mkdir -p outDir
         javac --module-path javafx-sdk/lib --add-modules javafx.controls -d outDir *.java
 
+    # Step 5: Create the JAR file
     - name: Create JAR file
       run: |
         jar cfm keyboard.jar MANIFEST.MF -C outDir .
 
-    - name: Upload JAR artifact
+    # Step 6: Upload the JAR as a build artifact
+    - name: Upload JAR as Artifact
       uses: actions/upload-artifact@v3
       with:
         name: keyboard.jar
         path: keyboard.jar
 
   release:
-    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'v')
     needs: build
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    # Step 1: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
 
+    # Step 2: Upload JAR to Release
     - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: keyboard.jar
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.sha }}
+        release_name: Release for Commit: ${{ github.sha }}
+        body: |
+          This release contains the compiled JavaFX application for commit message:
+          ${{ github.event.head_commit.message }}
+        draft: false
+        prerelease: false
+        files: keyboard.jar
