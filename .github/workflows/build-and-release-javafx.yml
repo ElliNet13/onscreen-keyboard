@@ -74,7 +74,6 @@ jobs:
           ${{ github.event.head_commit.message }}
         draft: false
         prerelease: false
-        files: |
-          ./keyboard.jar
+        files: "./keyboard.jar"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
