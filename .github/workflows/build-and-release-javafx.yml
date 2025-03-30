@@ -26,7 +26,7 @@ jobs:
     - name: Download and Extract JavaFX SDK
       run: |
         curl -L https://download2.gluonhq.com/openjfx/17.0.8/openjfx-17.0.8_linux-x64_bin-sdk.zip -o javafx-sdk.zip
-        unzip javafx-sdk.zip -d .
+        unzip javafx-sdk.zip -d . 
         mv javafx-sdk-* javafx-sdk
 
     # Step 4: Compile Java code
@@ -57,7 +57,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # Step 2: Create GitHub Release and Upload JAR using create-release-action@v2
+    # Step 2: Download the JAR artifact from the build job
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: keyboard.jar
+
+    # Step 3: Create GitHub Release and Upload JAR using create-release-action@v2
     - name: Create Release
       uses: create-release-action@v2
       with:
@@ -69,6 +75,6 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          keyboard.jar
+          ./keyboard.jar
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
